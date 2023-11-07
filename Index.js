@@ -1,12 +1,10 @@
 const { app, port } = require("./Src/app");
-const{connection} = require("./Src/db")
+const { connection } = require("./Src/db");
 
-
-/* -------SINCRONIZAMOS BASE DE DATOS Y SERVIDOR EXPRESS------------- */
+// // /* -------SINCRONIZAMOS BASE DE DATOS Y SERVIDOR EXPRESS------------- */
 
 connection().then(
-
-app.listen(port, () => {
+  app.listen(port, () => {
     console.log(`Servidor levantado en el puerto: ${port}`);
   })
-  );
+);
