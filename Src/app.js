@@ -14,13 +14,13 @@ app.use(cors()); /* Para aceptar peticiones del front o postman*/
 
 /* -------------------------- */
 // /* Vinculo mis modelos para usar rutas */
-const carro = require("./Models/Automoviles"); /* Conectamos el model correspondiente */
+const carro = require("./Models/automoviles"); /* Conectamos el model correspondiente */
 const User = require("./Models/Users");
 // /* RUTAS */
 
 app.get("/", (req, res) => {
   res.send(
-    "Hello World!, Ruta inicial de ejemplo, Bienvenido a la api de automoviles y mongoose"
+    "Hello World!, Ruta inicial de ejemplo, Bienvenido a la api de Automoviles y mongoose"
   );
 });
 

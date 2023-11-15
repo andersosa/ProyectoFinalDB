@@ -4,7 +4,7 @@ const express = require('express');
   const PORT = 3001;
 
 
-  mongoose.connect('mongodb://localhost:3000/user/electrodomesticos', {
+  mongoose.connect('mongodb://localhost:3000/user/Automoviles', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
