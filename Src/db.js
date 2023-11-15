@@ -1,5 +1,6 @@
 const mongoose = require("mongoose"); /* importo el módulo de mongoose */
 
+
 async function connection() {
   await mongoose
     .connect(

@@ -3,7 +3,8 @@
 const express = require("express"); //importo el modulo de express
 const cors = require("cors"); //importo el modulo de cors
 const app = express(); // lo ejecutamos y guardamos en una variable (guardamos una INSTANCIA de express)
-const port = 3000; // constante del puerto que levantare en el servidor
+const port = 3000;
+const jwt = require('jsonwebtoken'); // constante del puerto que levantare en el servidor
 //conectamos a mongo---
 require("./db.js"); /* ESTA LINEA ME CONECTA CON MONGO DB */
 
@@ -23,39 +24,23 @@ app.get("/", (req, res) => {
   );
 });
 
-app.get("/user", async (req, res) => {
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
   try {
-    const { email, password } = req.body;
+    const user = await User.findOne({ username });
 
-    //buscar si el mail o usuario existe
-    const userFound = await User.findOne({ email: email })
-
-    if (!userFound) {
-      res.status(400).send("El email ingresado no es correcto");
-    }
-    //comparar la contraseña
-    const matchedPassword = await User.comparePassword(
-      password,
-      userFound.password
-    );
-    if (!matchedPassword) {
-      res.status(400).send("La contraseña ingresada no es correcta");
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    //aca es donde se crea y devuelve el token-----
+    const token = jwt.sign({ username: user.username }, 'secreto', { expiresIn: '1h' });
 
-    res.status(200).json(userFound);
+    res.json({ token });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
-
-app.post("/carro", (req, res) => {
-  const name = req.query.name;
-  const nuevocarro = carro.create({ name: name });
-  res.json("carro creado correctamente");
-});
-
 app.post("/user", async (req, res) => {
   const {
     username,
@@ -63,24 +48,26 @@ app.post("/user", async (req, res) => {
     identification_number,
     password,
     phone_number,
-    carros, // ["Roberto", "Esteban"]
+    productos, 
   } = req.body;
+  
 
-  const carrosencontrados = await carro.find({ name: { $in: carros } });
+  const productosEncontrados = await carro.find({ name: { $in: productos } });
+  
 
-  /* crear la instancia del usuario */
+ 
   const user = new User({
     username: username,
     email: email,
     identification_number: identification_number,
-    password: password, //123456 =>cambia por el hash de encryptPassword()
+    password: password,
     phone_number: phone_number,
-    carros: carrosencontrados.map((auto) => auto._id), //=> [new ObjectId("651cb3a8f62c611047c7be57"),new ObjectId("651cb3b5f62c611047c7be59"),]
-  });
-  /* Debemos encriptar la contraseña */
+    productos: productosEncontrados.map((producto) => producto._id), });
+
+  
   user.password = await User.encryptPassword(password);
 
-  /* Guardo en la base de datos */
+  
   const newUser = user.save();
 
   res.status(200).json({
@@ -88,7 +75,9 @@ app.post("/user", async (req, res) => {
     username: newUser.username,
     mail: newUser.email,
   });
+
+
 });
 
-/* -------------------------------- */
+
 module.exports = { app, port };
